@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDSUGA - Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('{{ url_for('static', filename='brg.webp') }}');
+            background-size: cover;
+            background-position: center;
+        }
+        .header {
+            background-color: #c7b8ea; /* Pastel purple */
+            padding: 20px;
+            text-align: center;
+            position: relative; /* Added for positioning the exit button */
+        }
+        .header h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 36px; /* Adjust font size */
+        }
+        .container {
+            max-width: 1000px; /* Increased max-width */
+            margin: 40px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around; /* Adjusted to center with space around */
+        }
+        .result-section {
+            flex: 1;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .analyzing {
+            font-size: 18px;
+            font-weight: bold;
+            color: #666;
+        }
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+        .fall-detected {
+            color: #FF0000;
+        }
+        .no-fall {
+            color: #00FF00;
+        }
+        .no-human {
+            color: #0000FF;
+        }
+        .analysis {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #c7b8ea;
+            color: #fff;
+        }
+        .positive {
+            background-color: #FF0000;
+            color: #fff;
+        }
+        .negative {
+            background-color: #00FF00;
+            color: #fff;
+        }
+        .fall-incident-image {
+            max-width: 100px;
+            max-height: 100px;
+            margin-right: 10px;
+        }
+        .back-button {
+            background-color: #c7b8ea; /* Pastel purple */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .back-button:hover {
+            background-color: #5683e4;
+        }
+        .exit-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff6347; /* Tomato color */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .exit-button:hover {
+            background-color: #ff4500; /* OrangeRed color */
+        }
+        .carousel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .carousel img {
+            max-width: 100%;
+            max-height: 300px;
+        }
+        .carousel button {
+            background-color: #c7b8ea;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .carousel button:hover {
+            background-color: #5683e4;
+        }
+        .insight-section, .recommendation-section, .summary-section {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .insight-section h3, .recommendation-section h3, .summary-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FDSUGA - Results</h1>
+        <button class="exit-button" onclick="exitSystem()">Exit</button>
+    </div>
+    <div class="container">
+        <div class="result-section">
+            <h2>Results</h2>
+            <div id="analyzing" class="analyzing" style="display: none;">
+                <p>Analyzing...</p>
+            </div>
+            <div id="result" class="result">
+                {% if 'No Human Detected' in processed_actions %}
+                    <table>
+                        <tr>
+                            <th>Category</th>
+                            <th>Result</th>
+                        </tr>
+                        <tr>
+                            <td>Fall Detection</td>
+                            <td class="no-human">No Human Detected</td>
+                        </tr>
+                        <tr>
+                            <td>Actions Detection</td>
+                            <td class="no-human">No Human Detected</td>
+                        </tr>
+                    </table>
+                {% else %}
+                    <table>
+                        <tr>
+                            <th>Category</th>
+                            <th>Result</th>
+                        </tr>
+                        <tr>
+                            <td>Fall Detection</td>
+                            <td class="{% if 'Fall detected' in result %}positive{% else %}negative{% endif %}">{{ 'Fall detected' if 'Fall detected' in result else 'No fall detected' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Action Sequence Analysis</td>
+                            <td>{{ fall_analysis }}</td>
+                        </tr>
+                        <tr>
+                            <td>Fall Risk Analysis</td>
+                            <td>{{ fall_risk_analysis }}</td>
+                        </tr>
+                        <tr>
+                            <td>Actions Detection</td>
+                            <td>{{ processed_actions|join(', ') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Fall Incidents</td>
+                            <td>
+                                {% if fall_incidents %}
+                                    <div class="fall-incidents">
+                                        {% for interval in fall_incidents %}
+                                            <div>
+                                                <strong>Interval: {{ interval[0][1] }} ms to {{ interval[-1][1] }} ms</strong>
+                                                <br>
+                                                <div class="carousel">
+                                                    <button onclick="prevImage(this)">&#10094;</button>
+                                                    <img src="{{ url_for('static', filename=interval[0][0]) }}" alt="Fall Incident" class="fall-incident-image" data-images='{{ interval|map(attribute=0)|list|tojson }}'>
+                                                    <button onclick="nextImage(this)">&#10095;</button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    No fall incidents detected.
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                {% endif %}
+            </div>
+            <div class="insight-section">
+                <h3>Insight</h3>
+                <p>{{ insight|safe }}</p>
+            </div>
+            <div class="recommendation-section">
+                <h3>Recommendation</h3>
+                <p>{{ recommendation|safe }}</p>
+            </div>
+            <div class="summary-section">
+                <h3>Summary</h3>
+                <p>{{ summary|safe }}</p>
+            </div>
+            <button class="back-button" onclick="this.style.backgroundColor='#5683e4'; window.location.href='{{ url_for('index12') }}'">Back to Upload</button>
+        </div>
+    </div>
+
+    <script>
+        function clearResults() {
+            document.getElementById('result').innerText = '';
+            document.getElementById('analyzing').style.display = 'block';
+        }
+
+        function hideAnalyzing() {
+            document.getElementById('analyzing').style.display = 'none';
+        }
+
+        function playVideo() {
+            const video = document.getElementById('videoElement');
+            const videoSource = document.getElementById('videoSource');
+            videoSource.src = URL.createObjectURL(document.getElementById('video').files[0]);
+            video.load();
+            video.play();
+        }
+
+        function onVideoEnded() {
+            hideAnalyzing();
+            document.getElementById('result').innerText = '{{ result }}';
+            document.getElementById('analysis').innerHTML = '{{ result_analysis }}';
+        }
+    </script>
+    <script>
+        function exitSystem() {
+            // Redirect to the exit route
+            window.location.href = '/exit'
+        }
+        function nextImage(button) {
+            const img = button.previousElementSibling;
+            const images = JSON.parse(img.getAttribute('data-images'));
+            let currentIndex = images.indexOf(img.src.split('/').pop());
+            currentIndex = (currentIndex + 1) % images.length;
+            img.src = "{{ url_for('static', filename='') }}" + images[currentIndex];
+        }
+
+        function prevImage(button) {
+            const img = button.nextElementSibling;
+            const images = JSON.parse(img.getAttribute('data-images'));
+            let currentIndex = images.indexOf(img.src.split('/').pop());
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            img.src = "{{ url_for('static', filename='') }}" + images[currentIndex];
+        }
+    </script>
+</body>
+</html>
