@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDSUGA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('{{ url_for('static', filename='brg.webp') }}');
+            background-size: cover;
+            background-position: center;
+        }
+        .header {
+            background-color: #c7b8ea; /* Pastel purple */
+            padding: 20px;
+            text-align: center;
+            position: relative; /* Added for positioning the exit button */
+        }
+        .header h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 36px; /* Adjust font size */
+        }
+        .container {
+            max-width: 1000px; /* Increased max-width */
+            margin: 40px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around; /* Adjusted to center with space around */
+        }
+        .upload-section {
+            flex: 1;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .upload-button {
+            background-color: #c7b8ea; /* Pastel purple */
+            color: #fff;
+            padding: 15px 30px; /* Adjusted padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; /* Adjusted font size */
+        }
+        .upload-button:hover {
+            background-color: #5683e4;
+        }
+        .video-element {
+            width: 100%; /* Adjusted width */
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .analyzing-message {
+            margin-top: 10px;
+            color: #5683e4;
+            font-weight: bold;
+            display: none; /* Initially hidden */
+        }
+        .exit-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff6347; /* Tomato color */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .exit-button:hover {
+            background-color: #ff4500; /* OrangeRed color */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FDSUGA</h1>
+        <button class="exit-button" onclick="exitSystem()">Exit</button>
+    </div>
+    <div class="container">
+        <div class="upload-section">
+            <h2>Real-Time Video Processing</h2>
+            <button class="upload-button" onclick="startRealTimeVideo()">Start</button>
+            <button class="upload-button" onclick="stopRealTimeVideo()">Stop</button>
+            <div class="analyzing-message" id="analyzingMessage">Calibrating & Analyzing...</div>
+        </div>
+        <div class="video-section">
+            <img src="{{ url_for('video_feed') }}" width="640" height="480">
+        </div>
+    </div>
+
+    <script>
+        // Flag to check if the detection has started
+        let detectionStarted = false;
+
+        function startRealTimeVideo() {
+            // Set the flag to true and display the analyzing message
+            detectionStarted = true;
+            document.getElementById('analyzingMessage').style.display = 'block';
+            fetch('/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => console.log(data.message))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function stopRealTimeVideo() {
+            // Check if detection has started; if not, show an alert
+            if (!detectionStarted) {
+                alert('Please start the detection first by clicking the Start button.');
+                return;
+            }
+            // Stop detection and reset the flag
+            fetch('/stop', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    detectionStarted = false;
+                    console.log(data.message);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function exitSystem() {
+            window.location.href = '/exit';
+        }
+    </script>
+</body>
+</html>
