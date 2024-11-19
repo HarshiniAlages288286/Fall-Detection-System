@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDSUGA - Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('{{ url_for('static', filename='brg.webp') }}');
+            background-size: cover;
+            background-position: center;
+        }
+        .header {
+            background-color: #c7b8ea; /* Pastel purple */
+            padding: 20px;
+            text-align: center;
+            position: relative; /* Added for positioning the exit button */
+        }
+        .header h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 36px; /* Adjust font size */
+        }
+        .container {
+            max-width: 1000px; /* Increased max-width */
+            margin: 40px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around; /* Adjusted to center with space around */
+        }
+        .button-section {
+            flex: 1;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .button {
+            background-color: #c7b8ea; /* Pastel purple */
+            color: #fff;
+            padding: 15px 30px; /* Adjusted padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; /* Adjusted font size */
+            margin: 10px;
+        }
+        .button:hover {
+            background-color: #5683e4;
+        }
+        .exit-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff6347; /* Tomato color */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .exit-button:hover {
+            background-color: #ff4500; /* OrangeRed color */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FDSUGA</h1>
+        <button class="exit-button" onclick="exitSystem()">Exit</button>
+    </div>
+    <div class="container">
+        <div class="button-section">
+            <h2>Select Detection Mode</h2>
+            <button class="button" onclick="window.location.href='{{ url_for('realtime') }}'">Real-Time Detection</button>
+            <button class="button" onclick="window.location.href='{{ url_for('upload_video') }}'">Upload Video</button>
+        </div>
+    </div>
+
+    <script>
+        function exitSystem() {
+            // Redirect to the exit route
+            window.location.href = '/exit';
+        }
+    </script>
+</body>
+</html>
