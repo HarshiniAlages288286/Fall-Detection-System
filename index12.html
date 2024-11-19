@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FDSUGA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            background-image: url('{{ url_for('static', filename='brg.webp') }}');
+            background-size: cover;
+            background-position: center;
+        }
+        .header {
+            background-color: #c7b8ea; /* Pastel purple */
+            padding: 20px;
+            text-align: center;
+            position: relative; /* Added for positioning the exit button */
+        }
+        .header h1 {
+            margin: 0;
+            color: #fff;
+            font-size: 36px; /* Adjust font size */
+        }
+        .container {
+            max-width: 1000px; /* Increased max-width */
+            margin: 40px auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around; /* Adjusted to center with space around */
+        }
+        .upload-section {
+            flex: 1;
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .upload-button {
+            background-color: #c7b8ea; /* Pastel purple */
+            color: #fff;
+            padding: 15px 30px; /* Adjusted padding */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; /* Adjusted font size */
+        }
+        .upload-button:hover {
+            background-color: #5683e4;
+        }
+        .video-element {
+            width: 100%; /* Adjusted width */
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .analyzing-message {
+            display: none;
+            margin-left: 10px;
+            color: #5683e4;
+            font-weight: bold;
+        }
+        .exit-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff6347; /* Tomato color */
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .exit-button:hover {
+            background-color: #ff4500; /* OrangeRed color */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>FDSUGA</h1>
+        <button class="exit-button" onclick="exitSystem()">Exit</button>
+    </div>
+    <div class="container">
+        
+        <div class="upload-section">
+            <h2>Upload Video</h2>
+            <form id="uploadForm" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+                <label for="video">Select Video:</label>
+                <input type="file" name="video" id="video" accept="video/mp4" required>
+                <br><br>
+                <div class="video-container">
+                    <video id="videoElement" class="video-element" controls>
+                        <source id="videoSource" src="" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+                <br>
+                <button type="submit" class="upload-button" onclick="this.style.backgroundColor='#5683e4';">Upload and Analyze</button>
+                <span class="analyzing-message" id="analyzingMessage">Analyzing...</span>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+            const file = document.getElementById('video').files[0];
+            if (file) {
+                if (file.type !== 'video/mp4') {
+                    alert('Please upload a valid MP4 video file.');
+                    return;
+                }
+
+                const video = document.getElementById('videoElement');
+                const videoSource = document.getElementById('videoSource');
+                videoSource.src = URL.createObjectURL(file);
+                video.load();
+                video.play();
+
+                // Show the "Analyzing..." message
+                document.getElementById('analyzingMessage').style.display = 'inline';
+
+                video.onended = function() {
+                    document.getElementById('uploadForm').submit(); // Submit the form after the video ends
+                };
+            }
+        });
+
+        function exitSystem() {
+            // Redirect to the exit route
+            window.location.href = '/exit';
+        }
+    </script>
+</body>
+</html>
+
