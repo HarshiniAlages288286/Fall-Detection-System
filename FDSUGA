@@ -796,6 +796,5 @@ def exit_system():
 
 if __name__ == "__main__":
     app.run()
-    #19/11
+    #20/11
     #FDSUGA
-    #UPLOAD VIDEO ERROR
